@@ -4,40 +4,30 @@ pipeline{
   stages{
       stage("scm"){
          steps{
-          git branch: 'A27', url: 'https://github.com/ANTONYDAVID96/mvn-demo.git'
+          git branch: 'main', url: 'https://github.com/ANTONYDAVID96/project-1.git'
 }
     }
-       stage("build"){
-          steps{
-             sh 'mvn clean'
-              sh 'mvn install'
-    }
-       }
-       stage("image to build"){
+stage("image to build"){
           steps{
             script{
-                app = docker.build("antonydavid96/tomcat:1")
-                    app.inside {
-                        sh 'echo $(curl localhost:8080)'
-                    }
-            }
+                sh 'docker build -t antonydavid96/myapplication:1 .'
           }
 }
   stage("push image to hub"){
           steps{
             script{
-            withCredentials([string(credentialsId: 'dockeranto', variable: 'dcoker_antony')]) {
+            withCredentials([string(credentialsId: 'dockeranto', variable: 'docker_antony')]) {
                 sh "docker login -u antonydavid96 -p ${dcoker_antony}"
             }
-            sh 'docker push antonydavid96/tom:1'
+            sh 'docker push antonydavid96/myapplication:1'
   }
 }
   }
    stage("deploy to pro"){
           steps{
             script{
-                 def dockerRun ='docker run -p 8080:8080 -d --name tomcat antonydavid96/tom:1'
-                  sshagent(['antonyssh']) {
+                 def dockerRun ='docker run -p 8080:8080 -d --name samplepythonapplication antonydavid96/myapplication:1'
+                 sshagent(['docker_ssh']) {
                        sh "ssh -o StrictHostKeyChecking=no  ec2-user@3.93.199.182 ${dockerRun}"
   }
 }
