@@ -27,7 +27,7 @@ pipeline{
           stage("deploy to pro"){
             steps{
              script{
-                 def dockerRun ='docker run -itd -p 80:80 --name samplepythonapplication antonydavid96/myapplication:1'
+                 def dockerRun ='docker run -itd --name samplepythonapplication -P 8080:8080 antonydavid96/myapplication:1'
                  sshagent(['docker_ssh']) {
                        sh "ssh -o StrictHostKeyChecking=no  ec2-user@54.160.162.195 ${dockerRun}"
   }
